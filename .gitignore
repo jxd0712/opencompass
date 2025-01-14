@@ -133,3 +133,6 @@ turbomind/
 
 # aliyun
 core.*
+
+# compass-internal
+compass-internal
