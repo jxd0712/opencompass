@@ -25,7 +25,15 @@ OPENAI_API_BASE = os.path.join(
 OPENAISDK_API_BASE = os.environ.get('OPENAI_BASE_URL',
                                     'https://api.openai.com/v1/')
 
-O1_MODEL_LIST = ['o1', 'o3']
+O1_MODEL_LIST = [
+    'o1',
+    'o1-preview-2024-09-12',
+    'o1-mini-2024-09-12',
+    'o1-preview',
+    'o1-mini',
+    'o3',
+    'o3-mini-2025-01-31',
+]
 
 
 @MODELS.register_module()
@@ -91,6 +99,7 @@ class OpenAI(BaseAPIModel):
         temperature: Optional[float] = None,
         tokenizer_path: Optional[str] = None,
         extra_body: Optional[Dict] = None,
+        return_reasoning_content: Optional[bool] = False,
         verbose: bool = False,
     ):
 
@@ -114,12 +123,29 @@ class OpenAI(BaseAPIModel):
         self.tokenizer_path = tokenizer_path
         self.hf_tokenizer = None
         self.extra_body = extra_body
+        self.return_reasoning_content = return_reasoning_content
 
         if isinstance(key, str):
             if key == 'ENV':
                 if 'OPENAI_API_KEY' not in os.environ:
                     raise ValueError('OpenAI API key is not set.')
                 self.keys = os.getenv('OPENAI_API_KEY').split(',')
+            elif key == 'ENV_SILICONFLOW':
+                if 'SILICONFLOW_API_KEY' not in os.environ:
+                    raise ValueError('Siliconflow API key is not set.')
+                self.keys = os.getenv('SILICONFLOW_API_KEY').split(',')
+            elif key == 'ENV_DEEPSEEK':
+                if 'DEEPSEEK_API_KEY' not in os.environ:
+                    raise ValueError('Deepseek API key is not set.')
+                self.keys = os.getenv('DEEPSEEK_API_KEY').split(',')
+            elif key == 'ENV_ALIYUN':
+                if 'DASHSCOPE_API_KEY' not in os.environ:
+                    raise ValueError('DASHSCOPE API key (aliyun) is not set.')
+                self.keys = os.getenv('DASHSCOPE_API_KEY').split(',')
+            elif key == 'ENV_SENSETIME':
+                if 'SENSETIME_API_KEY' not in os.environ:
+                    raise ValueError('SENSETIME API key is not set.')
+                self.keys = os.getenv('SENSETIME_API_KEY').split(',')
             else:
                 self.keys = [key]
         else:
@@ -319,7 +345,16 @@ class OpenAI(BaseAPIModel):
                 if self.logprobs:
                     return response['choices']
                 else:
-                    return response['choices'][0]['message']['content'].strip()
+                    message = response['choices'][0]['message']
+                    content = message['content'].strip()
+                    if self.return_reasoning_content:
+                        r_content = message.get('reasoning_content',
+                                                '').strip()
+                        if r_content:
+                            r_content = '<think>' + r_content + '</think>'
+                        return r_content + content
+                    else:
+                        return content
             except KeyError:
                 if 'error' in response:
                     if response['error']['code'] == 'rate_limit_exceeded':
@@ -549,6 +584,7 @@ class OpenAISDK(OpenAI):
         temperature: float | None = None,
         tokenizer_path: str | None = None,
         extra_body: Dict | None = None,
+        return_reasoning_content: Optional[bool] = False,
         verbose: bool = False,
         status_code_mappings: dict = {},
     ):
@@ -570,7 +606,9 @@ class OpenAISDK(OpenAI):
             tokenizer_path,
             extra_body,
             verbose=verbose,
+            return_reasoning_content=return_reasoning_content,
         )
+        key = random.choice(self.keys)
         from openai import OpenAI
 
         # support multiple api_base for acceleration
@@ -671,7 +709,17 @@ class OpenAISDK(OpenAI):
                     # Continue to retry instead of returning empty response
                     continue
 
-                return responses.choices[0].message.content
+                message = responses.choices[0].message
+                content = message.content
+                if self.return_reasoning_content:
+                    try:
+                        r_content = message.reasoning_content
+                        r_content = '<think>' + r_content + '</think>'
+                    except AttributeError:
+                        r_content = ''
+                    return r_content + content
+                else:
+                    return content
 
             except (BadRequestError, APIStatusError) as e:
                 # Handle BadRequest status

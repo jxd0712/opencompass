@@ -283,3 +283,118 @@ def extract_non_reasoning_content(
                                  re.DOTALL)
     non_reasoning_content = reasoning_regex.sub('', text).strip()
     return non_reasoning_content
+
+@TEXT_POSTPROCESSORS.register_module('rm_<think>_before_eval')
+def remove_reasoning_part_before_evaluation(text: str):
+    if text.startswith('<think>'):
+        reasoning_end = text.rfind('</think>')
+        if reasoning_end == -1:
+            return text
+        else:
+            return text[reasoning_end + 8:]
+    else:
+        return text
+
+
+@TEXT_POSTPROCESSORS.register_module('extract_qwq_answer_before_eval')
+def extract_answer_before_evaluation(text: str):
+    """Overall, there are three situations in responses of QWQ:
+
+    1. There is a **Final Answer** title in the whole context.
+    2. There is only one sentence in the context.
+    3. There are more than one sentences in the context, \
+    and the last one is the answer.
+    """
+    text = text.strip('\n')
+    if '**Final Answer**' in text:
+        answer = text.split('\n\n**Final Answer**\n\n')[-1]
+    else:
+        if '\n\nHuman' in text:
+            text = text.split('\n\nHuman')[0]
+
+        text_split = text.split('.')
+        if text_split[-1] == '':
+            answer = text_split[-2] + '.'
+        else:
+            answer = text_split[-1] + '.'
+    return answer
+
+
+@TEXT_POSTPROCESSORS.register_module(
+    'extract_qwq_answer_before_eval_for_husimpleqa')
+def extract_answer_before_evaluation(text: str):
+    """The format of the answer from QwQ when inferring HuSimpleQA is \
+    different with others models due to the special prompt."""
+    max_sentence_len = 6
+    text_split = text.split('\n\n')
+    last_try_idx = max(len(text_split) - max_sentence_len, 0)
+    ans_start_idx = last_try_idx
+    has_answer = False
+    has_score = False
+    score_flags = [
+        'score', 'Score', 'confidence', 'Confidence', 'szcore', 'Szcore',
+        'pontszám', 'Pontszám', 'Biztonság', 'biztonság', 'Biztoságskor',
+        'biztoságskor', 'Biztoság', '信心', '分数'
+    ]
+    answer_flags = ['answer', 'Answer', 'Válasz', 'válasz', '答案', '回答']
+
+    for idx, s in enumerate(reversed(text_split)):
+        sen_idx = len(text_split) - 1 - idx
+        if sen_idx < last_try_idx:
+            break
+
+        for sf in score_flags:
+            if sf in s:
+                has_score = True
+                break
+
+        for af in answer_flags:
+            if af in s:
+                has_answer = True
+                break
+
+        if has_answer and has_score:
+            ans_start_idx = sen_idx
+            break
+
+    answer = '\n\n'.join(text_split[max(ans_start_idx - 1, 0):])
+
+    return answer
+
+
+@TEXT_POSTPROCESSORS.register_module(
+    'extract_qwq_answer_before_eval_for_humatchingfib')
+def extract_answer_before_evaluation(text: str):
+    """The format of the answer from QwQ when inferring HuSimpleQA is \
+    different with others models due to the special prompt."""
+    max_sentence_len = 30
+    if len(re.findall(r'\n\n', text)) > 2:
+        split_mark = '\n\n'
+    else:
+        split_mark = '\n'
+    text_split = text.split(split_mark)
+    last_try_idx = max(len(text_split) - max_sentence_len, 0)
+    ans_start_idx = last_try_idx
+    has_answer = False
+    answer_flags = [
+        'answer', 'Answer', 'Válasz', 'válasz', '答案', '回答', 'Summar', 'summar',
+        'Summar', 'summar'
+    ]
+
+    for idx, s in enumerate(reversed(text_split)):
+        sen_idx = len(text_split) - 1 - idx
+        if sen_idx < last_try_idx:
+            break
+
+        for af in answer_flags:
+            if af in s:
+                has_answer = True
+                break
+
+        if has_answer:
+            ans_start_idx = sen_idx
+            break
+
+    answer = '\n\n'.join(text_split[max(ans_start_idx - 1, 0):])
+
+    return answer, has_answer
