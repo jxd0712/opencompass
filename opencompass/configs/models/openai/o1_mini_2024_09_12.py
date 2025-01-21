@@ -12,9 +12,12 @@ models = [
         path='o1-mini-2024-09-12',
         key=
         'ENV',  # The key will be obtained from $OPENAI_API_KEY, but you can write down your key here as well
+        openai_proxy_url='ENV',
+        verbose=True,
         meta_template=api_meta_template,
         query_per_second=1,
+        max_out_len=8192,
+        max_seq_len=8192,
         batch_size=1,
-        temperature=1,
-        max_completion_tokens=8192), # you can change it for large reasoning inference cost, according to: https://platform.openai.com/docs/guides/reasoning
+        temperature=1), # you can change it for large reasoning inference cost, according to: https://platform.openai.com/docs/guides/reasoning
 ]
