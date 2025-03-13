@@ -72,7 +72,9 @@ datasets = HuMatchingFIB_datasets
 models = sum([v for k, v in locals().items() if k.endswith('_model')], [])
 
 for model in models:
-    if model['abbr'].startswith('deepseek_r1_api_'):
+    if model['abbr'].startswith('deepseek_r1_api_') or (
+        model['abbr'].startswith('QwQ') and model['abbr'] != 'QwQ-32B-Preview'
+    ):
         model['return_reasoning_content'] = True
         model['pred_postprocessor'] = {
             'OpenHuEval_*': {'type': 'rm_<think>_before_eval'}

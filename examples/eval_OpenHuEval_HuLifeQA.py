@@ -71,14 +71,6 @@ api_meta_template = dict(
     ]
 )
 
-for model in deepseek_r1_api_aliyun_model:
-    model['return_reasoning_content'] = True
-    model['pred_postprocessor'] = {'open_hu_eval_*': {'type': 'rm_<think>_before_eval'}}
-    if model['abbr'] == 'QwQ-32B-Preview':
-        model['pred_postprocessor'] = {
-            'OpenHuEval_*': {'type': 'extract_qwq_answer_before_eval'}
-        }
-del model
 
 models = [
     *gpt_4o_mini_20240718_model,
@@ -97,6 +89,16 @@ models = [
     *lmdeploy_internlm3_8b_instruct_model,
     *lmdeploy_qwq_32b_preview_model,
 ]
+
+for model in models:
+    if model['abbr'].startswith('deepseek_r1_api_') or (
+        model['abbr'].startswith('QwQ') and model['abbr'] != 'QwQ-32B-Preview'
+    ):
+        model['return_reasoning_content'] = True
+        model['pred_postprocessor'] = {
+            'OpenHuEval_*': {'type': 'rm_<think>_before_eval'}
+        }
+del model
 
 judge_models = [
     dict(
