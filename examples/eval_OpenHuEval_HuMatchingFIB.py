@@ -85,7 +85,6 @@ for model in models:
         }
 del model
 
-
 work_dir = (
     './outputs/' + __file__.split('/')[-1].split('.')[0] + '/'
 )  # do NOT modify this line, yapf: disable, pylint: disable
