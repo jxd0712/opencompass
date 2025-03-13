@@ -70,7 +70,10 @@ api_meta_template = dict(
         dict(role='BOT', api_role='BOT', generate=True),
     ]
 )
+<<<<<<< HEAD
 
+=======
+>>>>>>> [Feature] Support QwQ-32B and QwQ-Plus
 
 models = [
     *gpt_4o_mini_20240718_model,

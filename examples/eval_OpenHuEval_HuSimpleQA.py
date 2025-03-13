@@ -146,7 +146,16 @@ eval = dict(
     ),
 )
 
+<<<<<<< HEAD
 summarizer = dict(type=HuSimpleQASummarizer, prompt_languages=PROMPT_LANGUAGES)
+=======
+<<<<<<< HEAD
+summarizer = dict(type=HuSimpleQASummarizer, prompt_languages=PROMPT_LANGUAGES)
+=======
+summarizer = dict(type=HuSimpleQASummarizer,
+                  prompt_languages=PROMPT_LANGUAGES)
+>>>>>>> 6b84df9... add_qwen_api_qwq_32b
+>>>>>>> [Feature] Support QwQ-32B and QwQ-Plus
 
 work_dir = (
     './outputs/' + __file__.split('/')[-1].split('.')[0] + '/'
