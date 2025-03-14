@@ -168,22 +168,33 @@ class Qwen(BaseAPIModel):
                 reasoning_content = ''  # 定义完整思考过程
                 answer_content = ''  # 定义完整回复
                 is_answering = False  # 判断是否结束思考过程并开始回复
+                import time
+
                 for chunk in response:
-                    if (chunk.output.choices[0].message.content == '' and
-                            chunk.output.choices[0].message.reasoning_content
-                            == ''):
-                        pass
-                    else:
-                        if (chunk.output.choices[0].message.reasoning_content
-                                != '' and
-                                chunk.output.choices[0].message.content == ''):
-                            reasoning_content += chunk.output.choices[
-                                0].message.reasoning_content
-                        elif chunk.output.choices[0].message.content != '':
-                            if not is_answering:
-                                is_answering = True
-                            answer_content += chunk.output.choices[
-                                0].message.content
+                    if chunk.output is None or not hasattr(
+                            chunk.output, 'choices'):
+                        time.sleep(1)
+                        continue
+
+                    choice = chunk.output.choices[0]
+                    if not hasattr(choice,
+                                   'message') or choice.message is None:
+                        time.sleep(1)
+                        continue
+
+                    if choice.message.content == '' and \
+                            choice.message.reasoning_content == '':
+                        time.sleep(1)
+                        continue
+
+                    if choice.message.reasoning_content != '' and \
+                            choice.message.content == '':
+                        reasoning_content += choice.message.reasoning_content
+                    elif choice.message.content != '':
+                        if not is_answering:
+                            is_answering = True
+                        answer_content += choice.message.content
+
                 reasoning_content = '<think>' + reasoning_content + '</think>'
                 return reasoning_content + answer_content
             else:
