@@ -5,7 +5,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 
 with read_base():
-    from .HuLifeQA_setting import DATA_PATH, TASK_GROUP_NEW
+    from .HuLifeQA_setting import DATA_PATH, TASK_GROUP_NEW, DATA_VERSION
 
 hu_life_qa_reader_cfg = dict(
     input_columns=['dialogue', 'prompt'],
@@ -40,7 +40,7 @@ hu_life_qa_eval_cfg = dict(
 hu_life_qa_datasets = []
 hu_life_qa_datasets.append(
     dict(
-        abbr='open_hu_eval_hu_life_qa',
+        abbr=f'OpenHuEval_HuLifeQA_{DATA_VERSION}',
         type=WildBenchDataset,
         path=DATA_PATH,
         reader_cfg=hu_life_qa_reader_cfg,

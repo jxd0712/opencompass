@@ -39,8 +39,8 @@ with read_base():
     from opencompass.configs.models.qwq.qwq_plus_2025_03_05 import (
         models as qwq_plus_2025_03_05_model,
     )
-    from opencompass.configs.models.deepseek.deepseek_r1_api_aliyun import (
-        models as deepseek_r1_api_aliyun_model,
+    from opencompass.configs.models.deepseek.deepseek_r1_api_siliconflow import (
+        models as deepseek_r1_api_siliconflow_model,
     )
     from opencompass.configs.models.deepseek.deepseek_r1_api_siliconflow import (
         models as deepseek_r1_api_siliconflow_model,
