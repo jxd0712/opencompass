@@ -9,7 +9,7 @@ wildbench_reader_cfg = dict(
     output_column='judge',
 )
 
-data_path ='/mnt/hwfile/opendatalab/yanghaote/datasets/WildBench/wildbench.jsonl'
+data_path ='/mnt/hwfile/opendatalab/MinerU4S/yanghaote/XYZ/WildBench/wildbench.jsonl'
 
 wildbench_datasets = []
 wildbench_infer_cfg = dict(
