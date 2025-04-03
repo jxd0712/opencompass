@@ -10,7 +10,7 @@ with read_base():
     from .maps_prompts import LANG_TO_PROVERBS, LANG_TO_CONTEXTS, LANG_TO_CHOICES, LANG_TO_ANSWERS, LANG_TO_QUESTIONS, LANG_TO_INSTRUCTIONS1, LANG_TO_INSTRUCTIONS2
 
 # https://gitlab.pjlab.org.cn/wujiang/BeltRoadBench/-/tree/main/data/multilingual/maps # noqa
-dataset_path = '/mnt/hwfile/opendatalab/jiangbowen/data/BeltRoadBench/data/multilingual/maps'
+dataset_path = '/mnt/hwfile/opendatalab/MinerU4S/jiangbowen/data/BeltRoadBench/data/multilingual/maps'
 
 ALL_LANGUAGES = ['en', 'bn', 'id', 'de', 'ru', 'zh']
 maps_reader_cfg = dict(

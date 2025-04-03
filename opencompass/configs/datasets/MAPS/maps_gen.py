@@ -6,9 +6,9 @@ from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import MAPSDataset
 from opencompass.utils.text_postprocessors import first_option_postprocess
 
-dataset_path = '/mnt/hwfile/opendatalab/jiangbowen/data/BeltRoadBench/data/multilingual/maps'  # https://gitlab.pjlab.org.cn/wujiang/BeltRoadBench/-/tree/main/data/multilingual/maps # noqa
+dataset_path = '/mnt/hwfile/opendatalab/MinerU4S/jiangbowen/data/BeltRoadBench/data/multilingual/maps'  # https://gitlab.pjlab.org.cn/wujiang/BeltRoadBench/-/tree/main/data/multilingual/maps # noqa
 
-ALL_LANGUAGES = ['en', 'bn', 'id', 'de', 'ru', 'zh']
+ALL_LANGUAGES = ['en']
 maps_reader_cfg = dict(
     input_columns=['proverb', 'conversation', 'answer1', 'answer2'],
     output_column='answerKey')
